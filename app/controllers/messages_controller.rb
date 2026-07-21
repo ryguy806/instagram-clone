@@ -27,7 +27,8 @@ class MessagesController < ApplicationController
       if @message.save
         format.turbo_stream do
           render turbo_stream: [
-            turbo_stream.update('new_message', partial: 'messages/form', locals: { message: Message.new })
+            turbo_stream.update('new_message', partial: 'messages/form', locals: { message: Message.new }),
+            turbo_stream.prepend('messages', partial: 'messages/message', locals: { message: @message })
           ]
         end
         format.html { redirect_to message_url }
