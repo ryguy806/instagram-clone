@@ -4,7 +4,21 @@
     <%= message.body %>
   </div>
 
+  <% if message.updated_at != message.created_at %>
+    <div>
+      <strong>Updated Last:</strong>
+      <%= message.updated_at.to_fs%>
+    </div>
+
+    <% else %>
+    <div>
+      <strong>Created at:</strong>
+      <%= message.created_at.to_fs %>
+    </div>
+  <% end %>
+
   <p>
-    <%= link_to "Show this message", message %>
+    <%= link_to "Edit this message", edit_message_path(message) %>
+    <%= button_to "Delete this message", @message, method: :delete %>
   </p>
 </div>
