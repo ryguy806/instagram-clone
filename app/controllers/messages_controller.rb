@@ -1,5 +1,5 @@
 class MessagesController < ApplicationController
-  before_action :set_message, only: %i[ show edit update destroy ]
+  before_action :set_message, only: %i[show edit update destroy]
 
   # GET /messages or /messages.json
   def index
@@ -25,11 +25,19 @@ class MessagesController < ApplicationController
 
     respond_to do |format|
       if @message.save
-        format.html { redirect_to @message, notice: "Message was successfully created." }
-        format.json { render :show, status: :created, location: @message }
+        format.turbo_stream do
+          render turbo_stream: [
+            turbo_stream.update('new_message', partial: 'messages/form', locals: { message: Message.new })
+          ]
+        end
+        format.html { redirect_to message_url }
       else
+        format.turbo_stream do
+          render turbo_stream: [
+            turbo_stream.update('new_message', partial: 'messages/form', locals: { message: @message })
+          ]
+        end
         format.html { render :new, status: :unprocessable_content }
-        format.json { render json: @message.errors, status: :unprocessable_content }
       end
     end
   end
@@ -38,7 +46,7 @@ class MessagesController < ApplicationController
   def update
     respond_to do |format|
       if @message.update(message_params)
-        format.html { redirect_to @message, notice: "Message was successfully updated.", status: :see_other }
+        format.html { redirect_to @message, notice: 'Message was successfully updated.', status: :see_other }
         format.json { render :show, status: :ok, location: @message }
       else
         format.html { render :edit, status: :unprocessable_content }
@@ -52,19 +60,20 @@ class MessagesController < ApplicationController
     @message.destroy!
 
     respond_to do |format|
-      format.html { redirect_to messages_path, notice: "Message was successfully destroyed.", status: :see_other }
+      format.html { redirect_to messages_path, notice: 'Message was successfully destroyed.', status: :see_other }
       format.json { head :no_content }
     end
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_message
-      @message = Message.find(params.expect(:id))
-    end
 
-    # Only allow a list of trusted parameters through.
-    def message_params
-      params.expect(message: [ :body ])
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_message
+    @message = Message.find(params.expect(:id))
+  end
+
+  # Only allow a list of trusted parameters through.
+  def message_params
+    params.expect(message: [:body])
+  end
 end
