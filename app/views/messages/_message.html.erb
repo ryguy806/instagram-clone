@@ -17,8 +17,8 @@
     </div>
   <% end %>
 
-  <p>
+  <div>
     <%= link_to "Edit this message", edit_message_path(message) %>
-    <%= button_to "Delete this message", @message, method: :delete %>
-  </p>
+    <%= button_to "Delete this message", message_path(message), method: :delete %>
+  </div>
 </div>
